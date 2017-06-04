@@ -1,7 +1,10 @@
 [
     {
         "name": "personal_website",
-        "docker_directory_path": "/var/www/personal_website/docker",
         "server_url": "clintjedwards.com"
+    },
+    {
+        "name": "basecoat",
+        "server_url": "basecoat.clintjedwards.com"
     }
 ]
