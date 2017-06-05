@@ -2,15 +2,16 @@
 
 package main
 
-import "fmt"
+import "strings"
 import "gopkg.in/alecthomas/kingpin.v2"
 
-func argument_parse() {
+func argument_parse() []string{
 
-    var action = kingpin.Arg("action", "Action to perform on environment.").Required().String()
-    var environment = kingpin.Arg("environment", "Environment to perform action in. Environment names are pulled from json file.").Required().String()
+    var server_url = kingpin.Arg("server_url", "Server to connect to in format: user@example.com").Required().String()
 
     kingpin.Parse()
-    fmt.Printf("%s, %s\n", *action, *environment)
 
+    server_url_slice := strings.Split(*server_url, "@")
+
+    return server_url_slice
 }

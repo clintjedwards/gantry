@@ -11,9 +11,9 @@ import "fmt"
 
 func main() {
 
-    argument_parse()
-    config := load_config()
+    connection_url_slice := argument_parse()
+    connect_to_remote(connection_url_slice[0], connection_url_slice[1])
 
-    fmt.Println(config)
+    fmt.Println(connection_url_slice)
 
 }
