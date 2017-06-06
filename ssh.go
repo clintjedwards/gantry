@@ -18,7 +18,6 @@ func SSHAgent() ssh.AuthMethod {
 		return ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers)
 	}
 	return nil
-
 }
 
 
@@ -27,12 +26,27 @@ func connect_to_remote(username string, hostname string) {
     sshConfig := &ssh.ClientConfig{
     	User: username,
     	Auth: []ssh.AuthMethod{SSHAgent()},
+        HostKeyCallback: ssh.InsecureIgnoreHostKey(),
     }
 
     connection, err := ssh.Dial("tcp", hostname + ":" + "22", sshConfig)
     if err != nil {
-    	fmt.Errorf("Failed to dial: %s", err)
+    	fmt.Printf("Failed to dial: %s", err)
+        return
     }
 
-    fmt.Println(connection)
+    session, err := connection.NewSession()
+    if err != nil {
+    	connection.Close()
+        fmt.Println(err)
+    }
+
+    out, err := session.CombinedOutput("pwd")
+    if err != nil {
+        connection.Close()
+        fmt.Println(err)
+    }
+
+    fmt.Println(string(out))
+    connection.Close()
 }
