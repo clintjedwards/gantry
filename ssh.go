@@ -20,8 +20,18 @@ func SSHAgent() ssh.AuthMethod {
 	return nil
 }
 
+func establish_local_listner() *net.Listen{
 
-func connect_to_remote(username string, hostname string) {
+    listener, err := net.Listen("tcp", "localhost:9876")
+    if err != nil {
+        listener.Close()
+        return err
+    }
+
+    return listener
+}
+
+func connect_to_remote(username string, hostname string) *net.Conn{
 
     sshConfig := &ssh.ClientConfig{
     	User: username,
@@ -29,24 +39,50 @@ func connect_to_remote(username string, hostname string) {
         HostKeyCallback: ssh.InsecureIgnoreHostKey(),
     }
 
-    connection, err := ssh.Dial("tcp", hostname + ":" + "22", sshConfig)
+    remote_connection, err := ssh.Dial("tcp", hostname + ":" + "22", sshConfig)
     if err != nil {
     	fmt.Printf("Failed to dial: %s", err)
-        return
+        panic("Exiting")
     }
 
-    session, err := connection.NewSession()
+    return remote_connection
+
+}
+
+func connect_to_remote_socket(remote_connection *net.Conn) *net.Conn{
+
+    socket_connection, err := remote_connection.Dial("unix", "/var/run/docker.sock")
     if err != nil {
-    	connection.Close()
-        fmt.Println(err)
+    	fmt.Printf("Failed to dial: %s", err)
+        panic("Exiting")
     }
 
-    out, err := session.CombinedOutput("pwd")
+    return socket_connection
+}
+
+func copy_connection_data(writer, reader net.Conn){
+    _, err:= io.Copy(writer, reader)
     if err != nil {
-        connection.Close()
-        fmt.Println(err)
+        fmt.Printf("io.Copy error: %s", err)
     }
+}
 
-    fmt.Println(string(out))
-    connection.Close()
+func establish_tunnel(username string, hostname string) {
+    listener := establish_local_listner()
+
+    for {
+		local_connection, err := listener.Accept()
+		if err != nil {
+			return err
+		}
+
+        remote_connection := connect_to_remote(username, hostname)
+        socket_connection := connect_to_remote_socket(remote_connection)
+
+
+    	go copy_connection_data(local_connection, remote_connection)
+        go copy_connection_data(remote_connection, local_connection)
+
+	}
+
 }
