@@ -1,4 +1,4 @@
-// Gantry is a tool for manipulating docker-compose infrastructure using ssh
+// Gantry is a tool for manipulating docker-compose infrastructure using ssh tunneling
 
 //  Idea is to create a tool that simply ssh's into a server
 //  creates an ssh tunnel for you and then drops you into a shell with the right
@@ -7,13 +7,12 @@
 
 package main
 
-import "fmt"
+//import "fmt"
 
 func main() {
 
-    connection_url_slice := argument_parse()
-    establish_tunnel(connection_url_slice[0], connection_url_slice[1])
-
-    fmt.Println(connection_url_slice)
+    arguments := argument_parse()
+    go establish_tunnel(arguments.remote_username, arguments.remote_url, arguments.local_port)
+    spawn_interactive_shell(arguments)
 
 }

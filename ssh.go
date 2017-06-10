@@ -8,6 +8,7 @@ package main
 import "fmt"
 import "net"
 import "os"
+import "io"
 
 import "golang.org/x/crypto/ssh"
 import "golang.org/x/crypto/ssh/agent"
@@ -20,18 +21,18 @@ func SSHAgent() ssh.AuthMethod {
 	return nil
 }
 
-func establish_local_listner() *net.Listen{
+func establish_local_listner(port string) net.Listener{
 
-    listener, err := net.Listen("tcp", "localhost:9876")
+    listener, err := net.Listen("tcp", "localhost:" + port)
     if err != nil {
         listener.Close()
-        return err
+        panic(err)
     }
 
     return listener
 }
 
-func connect_to_remote(username string, hostname string) *net.Conn{
+func connect_to_remote(username string, hostname string) *ssh.Client{
 
     sshConfig := &ssh.ClientConfig{
     	User: username,
@@ -49,7 +50,7 @@ func connect_to_remote(username string, hostname string) *net.Conn{
 
 }
 
-func connect_to_remote_socket(remote_connection *net.Conn) *net.Conn{
+func connect_to_remote_socket(remote_connection *ssh.Client) *net.Conn{
 
     socket_connection, err := remote_connection.Dial("unix", "/var/run/docker.sock")
     if err != nil {
@@ -57,7 +58,7 @@ func connect_to_remote_socket(remote_connection *net.Conn) *net.Conn{
         panic("Exiting")
     }
 
-    return socket_connection
+    return &socket_connection
 }
 
 func copy_connection_data(writer, reader net.Conn){
@@ -67,21 +68,21 @@ func copy_connection_data(writer, reader net.Conn){
     }
 }
 
-func establish_tunnel(username string, hostname string) {
-    listener := establish_local_listner()
+func establish_tunnel(username string, hostname string, local_port string) {
+    listener := establish_local_listner(local_port)
 
     for {
 		local_connection, err := listener.Accept()
 		if err != nil {
-			return err
+			panic(err)
 		}
 
         remote_connection := connect_to_remote(username, hostname)
         socket_connection := connect_to_remote_socket(remote_connection)
 
 
-    	go copy_connection_data(local_connection, remote_connection)
-        go copy_connection_data(remote_connection, local_connection)
+    	go copy_connection_data(local_connection, *socket_connection)
+        go copy_connection_data(*socket_connection, local_connection)
 
 	}
 
