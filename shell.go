@@ -1,5 +1,4 @@
-//We set up the proper environment for the user
-// then drop into an interactive shell
+//We set up the proper environment for the user then drop into an interactive shell
 // author: http://technosophos.com/2014/07/11/start-an-interactive-shell-from-within-go.html
 
 package main
@@ -31,13 +30,10 @@ func spawn_interactive_shell(arguments Arguments) {
     }
 
     fmt.Printf("Connected via tcp://localhost:%s to %s as user %s\n", arguments.local_port, arguments.remote_url, arguments.remote_username)
-    //fmt.Println("Connected via tcp://localhost:" + arguments.local_port + " to " + arguments.remote_username + ":" + arguments.remote_url)
     fmt.Println("Starting dockerized interactive shell")
 
-    // Start up a new shell.
-    // Note that we supply "login" twice.
-    // -fpl means "don't prompt for PW and pass through environment."
-    proc, err := os.StartProcess("/usr/bin/login", []string{"login", "-fpl", current_user.Username}, &pa)
+    // -fplq means "don't prompt for PW, pass through environment, don't print login info"
+    proc, err := os.StartProcess("/usr/bin/login", []string{"login", "-fplq", current_user.Username}, &pa)
     if err != nil {
         panic(err)
     }

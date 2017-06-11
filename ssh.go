@@ -1,7 +1,4 @@
-//Provides functions to create local port,
-//                        ssh into remote server,
-//                        connect to docker socket and
-//                        spawn terminal that has the proper docker env variables to talk to daemon
+// Provides functions to handle ssh tunneling
 
 package main
 
@@ -21,6 +18,8 @@ func SSHAgent() ssh.AuthMethod {
 	return nil
 }
 
+
+//Opens local port on host machine and listens for connections
 func establish_local_listner(port string) net.Listener{
 
     listener, err := net.Listen("tcp", "localhost:" + port)
@@ -32,6 +31,8 @@ func establish_local_listner(port string) net.Listener{
     return listener
 }
 
+
+//Establish ssh connection to remote machine
 func connect_to_remote(username string, hostname string) *ssh.Client{
 
     sshConfig := &ssh.ClientConfig{
@@ -50,6 +51,7 @@ func connect_to_remote(username string, hostname string) *ssh.Client{
 
 }
 
+//Establish socket connection on remote machine
 func connect_to_remote_socket(remote_connection *ssh.Client) *net.Conn{
 
     socket_connection, err := remote_connection.Dial("unix", "/var/run/docker.sock")
@@ -61,6 +63,8 @@ func connect_to_remote_socket(remote_connection *ssh.Client) *net.Conn{
     return &socket_connection
 }
 
+
+//Allow two way communication between two connections
 func copy_connection_data(writer, reader net.Conn){
     _, err:= io.Copy(writer, reader)
     if err != nil {
@@ -68,6 +72,7 @@ func copy_connection_data(writer, reader net.Conn){
     }
 }
 
+//Etablish local, remote, socket connections and then allow communication
 func establish_tunnel(username string, hostname string, local_port string) {
     listener := establish_local_listner(local_port)
 

@@ -1,4 +1,4 @@
-// Controls argument parsing for gantry program
+// Controls command line argument parsing for gantry
 
 package main
 

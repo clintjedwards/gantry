@@ -1,13 +1,11 @@
-// Gantry is a tool for manipulating docker-compose infrastructure using ssh tunneling
+// Gantry is a tool for manipulating docker infrastructure over ssh
 
-//  Idea is to create a tool that simply ssh's into a server
-//  creates an ssh tunnel for you and then drops you into a shell with the right
-//  docker variables set. This would enable you to run normal docker commands on
-//  the remote host and wouldn't have to recreate commands
+// It uses ssh tunneling to establish a connection to the docker socket file
+// and then drops the user into an interactive terminal with the correct
+// docker host env variable. Allowing the local docker engine to communicate with the
+// remote docker instance.
 
 package main
-
-//import "fmt"
 
 func main() {
 
