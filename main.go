@@ -9,8 +9,8 @@ package main
 
 func main() {
 
-    arguments := argument_parse()
-    go establish_tunnel(arguments.remote_username, arguments.remote_url, arguments.local_port)
-    spawn_interactive_shell(arguments)
+	arguments := argumentParse()
+	go establishTunnel(arguments.remoteUsername, arguments.remoteURL, arguments.localPort)
+	spawnInteractiveShell(arguments)
 
 }

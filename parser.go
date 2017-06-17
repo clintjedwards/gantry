@@ -5,27 +5,27 @@ package main
 import "strings"
 import "gopkg.in/alecthomas/kingpin.v2"
 
-
-type Arguments struct{
-    remote_username string
-    remote_url string
-    local_port string
+// Arguments represents storage object for command-line parsed variables.
+type Arguments struct {
+	remoteUsername string
+	remoteURL      string
+	localPort      string
 }
 
-func argument_parse() Arguments{
+func argumentParse() Arguments {
 
-    var server_url = kingpin.Arg("server_url", "Server to connect to in format: user@example.com").Required().String()
-    var port = kingpin.Arg("port", "Local port to bind to. Will bind to 9876 if not specified").Default("9876").String()
+	var serverURL = kingpin.Arg("serverURL", "Server to connect to in format: user@example.com").Required().String()
+	var port = kingpin.Arg("port", "Local port to bind to. Will bind to 9876 if not specified").Default("9876").String()
 
-    kingpin.Parse()
+	kingpin.Parse()
 
-    arguments := Arguments{}
+	arguments := Arguments{}
 
-    server_url_slice := strings.Split(*server_url, "@")
+	serverURLSlice := strings.Split(*serverURL, "@")
 
-    arguments.remote_username = server_url_slice[0]
-    arguments.remote_url = server_url_slice[1]
-    arguments.local_port = *port
+	arguments.remoteUsername = serverURLSlice[0]
+	arguments.remoteURL = serverURLSlice[1]
+	arguments.localPort = *port
 
-    return arguments
+	return arguments
 }
