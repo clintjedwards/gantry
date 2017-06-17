@@ -3,20 +3,23 @@
 
 package main
 
-import "os"
-import "os/user"
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+	"os/user"
+)
 
 func spawnInteractiveShell(arguments Arguments) {
 
 	currentUser, err := user.Current()
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 
 	os.Setenv("DOCKER_HOST", "tcp://localhost:"+arguments.localPort)
@@ -34,15 +37,15 @@ func spawnInteractiveShell(arguments Arguments) {
 	// -fplq means "don't prompt for PW, pass through environment, don't print login info"
 	proc, err := os.StartProcess("/usr/bin/login", []string{"login", "-fplq", currentUser.Username}, &pa)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 
 	// Wait until user exits the shell
-	state, err := proc.Wait()
+	_, err = proc.Wait()
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 
 	// Alert the user that they have exited shell
-	fmt.Printf("Exited dockerized shell: %s\n", state.String())
+	fmt.Printf("Exited dockerized shell")
 }

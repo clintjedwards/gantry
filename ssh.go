@@ -2,13 +2,15 @@
 
 package main
 
-import "fmt"
-import "net"
-import "os"
-import "io"
+import (
+	"io"
+	"log"
+	"net"
+	"os"
 
-import "golang.org/x/crypto/ssh"
-import "golang.org/x/crypto/ssh/agent"
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/agent"
+)
 
 //SSHAgent leverages the local ssh-agent process to authenticate
 func SSHAgent() ssh.AuthMethod {
@@ -24,8 +26,8 @@ func establishLocalListener(port string) net.Listener {
 
 	listener, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
-		listener.Close()
-		panic(err)
+		log.Print(err)
+		//listener.Close()
 	}
 
 	return listener
@@ -42,8 +44,8 @@ func connectToRemote(username string, hostname string) *ssh.Client {
 
 	remoteConnection, err := ssh.Dial("tcp", hostname+":"+"22", sshConfig)
 	if err != nil {
-		fmt.Printf("Failed to dial: %s", err)
-		panic("Exiting")
+		log.Print(err)
+		return nil
 	}
 
 	return remoteConnection
@@ -55,8 +57,7 @@ func connectToRemoteSocket(remoteConnection *ssh.Client) *net.Conn {
 
 	socketConnection, err := remoteConnection.Dial("unix", "/var/run/docker.sock")
 	if err != nil {
-		fmt.Printf("Failed to dial: %s", err)
-		panic("Exiting")
+		log.Fatal("Cannot connect to docker socket successfully. Check permissions and make sure process is running.")
 	}
 
 	return &socketConnection
@@ -66,7 +67,7 @@ func connectToRemoteSocket(remoteConnection *ssh.Client) *net.Conn {
 func copyConnectionData(writer, reader net.Conn) {
 	_, err := io.Copy(writer, reader)
 	if err != nil {
-		fmt.Printf("io.Copy error: %s", err)
+		log.Print(err)
 	}
 }
 
@@ -77,7 +78,7 @@ func establishTunnel(username string, hostname string, localPort string) {
 	for {
 		localConnection, err := listener.Accept()
 		if err != nil {
-			panic(err)
+			log.Print(err)
 		}
 
 		remoteConnection := connectToRemote(username, hostname)
