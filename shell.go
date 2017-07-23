@@ -7,15 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/user"
 )
 
 func spawnInteractiveShell(arguments Arguments) {
-
-	currentUser, err := user.Current()
-	if err != nil {
-		log.Print(err)
-	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -32,10 +26,9 @@ func spawnInteractiveShell(arguments Arguments) {
 	}
 
 	fmt.Printf("Connected via tcp://localhost:%s to %s as user %s\n", arguments.localPort, arguments.remoteURL, arguments.remoteUsername)
-	fmt.Println("Starting dockerized interactive shell")
+	fmt.Println("Starting dockerized interactive shell 🐳")
 
-	// -fplq means "don't prompt for PW, pass through environment, don't print login info"
-	proc, err := os.StartProcess("/usr/bin/login", []string{"login", "-fplq", currentUser.Username}, &pa)
+	proc, err := os.StartProcess("/bin/bash", []string{"bash", "--rcfile", "./bashrc"}, &pa)
 	if err != nil {
 		log.Print(err)
 	}
@@ -47,5 +40,5 @@ func spawnInteractiveShell(arguments Arguments) {
 	}
 
 	// Alert the user that they have exited shell
-	fmt.Printf("Exited dockerized shell")
+	fmt.Printf("Exited dockerized shell\n")
 }
