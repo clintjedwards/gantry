@@ -1,5 +1,4 @@
 //We set up the proper environment for the user then drop into an interactive shell
-// author: http://technosophos.com/2014/07/11/start-an-interactive-shell-from-within-go.html
 
 package main
 
@@ -17,6 +16,7 @@ func spawnInteractiveShell(arguments Arguments) {
 	}
 
 	os.Setenv("DOCKER_HOST", "tcp://localhost:"+arguments.localPort)
+	os.Setenv("GANTRY_HOST", fmt.Sprintf("%s@%s", arguments.remoteUsername, arguments.remoteURL))
 
 	// Transfer stdin, stdout, and stderr to the new process
 	// and also set target directory for the shell to start in.
@@ -39,6 +39,5 @@ func spawnInteractiveShell(arguments Arguments) {
 		log.Print(err)
 	}
 
-	// Alert the user that they have exited shell
-	fmt.Printf("Exited dockerized shell\n")
+	defer fmt.Printf("Exited dockerized shell\n")
 }
