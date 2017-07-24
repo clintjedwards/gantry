@@ -4,9 +4,44 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 )
+
+func createTmpBashrc() *os.File {
+
+	content := []byte(`
+		#Prompt settings
+		PS1="\[\e[34m[\$GANTRY_HOST]\] gantry $ \[\e[0m\]"
+
+		#Shortcuts
+		function full_deploy() {
+    		docker-compose -f docker-compose.producution.yml pull
+    		docker-compose -f docker-compose.production.yml down
+    		docker-compose -f docker-compose.production.yml up -d
+		}
+
+		function deploy() {
+    		docker-compose -f docker-compose.production.yml pull
+    		docker-compose -f docker-compose.production.yml up -d
+		}
+	`)
+
+	tmpfile, err := ioutil.TempFile("", "bashrc")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err := tmpfile.Write(content); err != nil {
+		log.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		log.Fatal(err)
+	}
+
+	return tmpfile
+}
 
 func spawnInteractiveShell(arguments Arguments) {
 
@@ -28,10 +63,14 @@ func spawnInteractiveShell(arguments Arguments) {
 	fmt.Printf("Connected via tcp://localhost:%s to %s as user %s\n", arguments.localPort, arguments.remoteURL, arguments.remoteUsername)
 	fmt.Println("Starting dockerized interactive shell 🐳")
 
-	proc, err := os.StartProcess("/bin/bash", []string{"bash", "--rcfile", "./bashrc"}, &pa)
+	rcfile := createTmpBashrc()
+
+	proc, err := os.StartProcess("/bin/bash", []string{"bash", "--rcfile", rcfile.Name()}, &pa)
 	if err != nil {
 		log.Print(err)
 	}
+
+	defer os.Remove(rcfile.Name())
 
 	// Wait until user exits the shell
 	_, err = proc.Wait()
