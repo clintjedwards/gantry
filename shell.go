@@ -17,21 +17,31 @@ func createTmpBashrc() *os.File {
 
 		#Shortcuts
 		function deploy() {
-    		docker-compose -f docker-compose.production.yml pull
-    		docker-compose -f docker-compose.production.yml down
-    		docker-compose -f docker-compose.production.yml up -d
+    		{
+				docker-compose -f docker-compose.production.yml pull &&
+    			docker-compose -f docker-compose.production.yml down &&
+				docker-compose -f docker-compose.production.yml up -d
+			} || {
+				echo "Command failed: Make sure you're in your project's correct docker directory"
+				echo "Gantry expects compose file named: docker-compose.production.yml"
+			}
 		}
 
 		function push() {
-    		docker-compose -f docker-compose.production.yml pull
-    		docker-compose -f docker-compose.production.yml up -d
+			{
+    			docker-compose -f docker-compose.production.yml pull &&
+				docker-compose -f docker-compose.production.yml up -d
+			} || {
+				echo "Command failed: Make sure you're in your project's correct docker directory"
+				echo "Gantry expects compose file named: docker-compose.production.yml"
+			}
 		}
 
 		function help(){
 			echo "Help:"
 			echo "============"
-			echo "gantry deploy - Full pull, shutdown, and restart of environment"
-			echo "gantry push   - Quick pull and restart of environment"
+			echo "gantry deploy - Pull, full shutdown, and restart of environment"
+			echo "gantry push   - Pull and quick restart of environment"
 		}
 
 		function gantry(){
