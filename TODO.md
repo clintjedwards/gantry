@@ -6,7 +6,4 @@
     * Currently this fails on first try of a docker command but acts normally until you try
 * Remember to document(both in app and not) loading the key first errors
 
-* Implement
-    * full-deploy bash function
-    * partial-deploy bash function
 

@@ -27,7 +27,7 @@ func establishLocalListener(port string) net.Listener {
 	listener, err := net.Listen("tcp", "localhost:"+port)
 	if err != nil {
 		log.Print(err)
-		//listener.Close()
+		listener.Close()
 	}
 
 	return listener
@@ -45,7 +45,6 @@ func connectToRemote(username string, hostname string) *ssh.Client {
 	remoteConnection, err := ssh.Dial("tcp", hostname+":"+"22", sshConfig)
 	if err != nil {
 		log.Print(err)
-		return nil
 	}
 
 	return remoteConnection
@@ -74,15 +73,17 @@ func copyConnectionData(writer, reader net.Conn) {
 //Establish local, remote, socket connections and then allow communication
 func establishTunnel(username string, hostname string, localPort string) {
 	listener := establishLocalListener(localPort)
+	remoteConnection := connectToRemote(username, hostname)
+	socketConnection := connectToRemoteSocket(remoteConnection)
+
+	defer remoteConnection.Close()
+	defer listener.Close()
 
 	for {
 		localConnection, err := listener.Accept()
 		if err != nil {
-			log.Print(err)
+			log.Println(err)
 		}
-
-		remoteConnection := connectToRemote(username, hostname)
-		socketConnection := connectToRemoteSocket(remoteConnection)
 
 		go copyConnectionData(localConnection, *socketConnection)
 		go copyConnectionData(*socketConnection, localConnection)
