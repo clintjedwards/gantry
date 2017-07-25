@@ -88,6 +88,8 @@ func establishTunnel(username string, hostname string, localPort string) {
 		go copyConnectionData(localConnection, *socketConnection)
 		go copyConnectionData(*socketConnection, localConnection)
 
+		socketConnection = connectToRemoteSocket(remoteConnection)
+
 	}
 
 }
