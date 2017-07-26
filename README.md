@@ -29,21 +29,11 @@ Args:
 ```
 
 ## Example
-```
-gantry|master⚡ ⇒ gantry ubuntu@utility.clintjedwards.com
-Connected via tcp://localhost:9876 to utility.clintjedwards.com as user ubuntu
-Starting dockerized interactive shell
-gantry|master⚡ ⇒ docker info
-...
-Kernel Version: 4.8.0-53-generic
-Operating System: Ubuntu 16.04.2 LTS
-OSType: linux
-Architecture: x86_64
-...
-gantry|master⚡ ⇒ docker ps
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                NAMES
-f618d7c677f3        gantry_test         "bash"              44 hours ago        Up 44 hours         0.0.0.0:22->22/tcp   cranky_perlman
-```
+[![asciicast](https://asciinema.org/a/130638.png)](https://asciinema.org/a/130638)
+
+## Troubleshooting
+* Make sure the ssh key you're using is loaded via `ssh-add` (ssh agent)
+* Make sure the user has permissions to log into the remote machine and talk to the remote docker socket
 
 ## Problem | Solution
 Looking for an easy way to manage remote docker instances I quickly boiled down my choices to the recommended docker machine. While feature filled the docker machine tool had some short comings I couldn't reconcile.

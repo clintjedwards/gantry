@@ -44,7 +44,7 @@ func connectToRemote(username string, hostname string) *ssh.Client {
 
 	remoteConnection, err := ssh.Dial("tcp", hostname+":"+"22", sshConfig)
 	if err != nil {
-		log.Print(err)
+		log.Fatalf("remote connectioned failed: please check valid ssh key is loaded and access to the server is permitted\n%v", err)
 	}
 
 	return remoteConnection
@@ -52,11 +52,11 @@ func connectToRemote(username string, hostname string) *ssh.Client {
 }
 
 //Establish socket connection on remote machine
-func connectToRemoteSocket(remoteConnection *ssh.Client) *net.Conn {
+func connectToSocket(remoteConnection *ssh.Client, socketPath string) *net.Conn {
 
-	socketConnection, err := remoteConnection.Dial("unix", "/var/run/docker.sock")
+	socketConnection, err := remoteConnection.Dial("unix", socketPath)
 	if err != nil {
-		log.Fatal("Cannot connect to docker socket successfully. Check permissions and make sure process is running.")
+		log.Fatal("Cannot connect to socket successfully. Check permissions and make sure process is running.")
 	}
 
 	return &socketConnection
@@ -74,7 +74,7 @@ func copyConnectionData(writer, reader net.Conn) {
 func establishTunnel(username string, hostname string, localPort string) {
 	listener := establishLocalListener(localPort)
 	remoteConnection := connectToRemote(username, hostname)
-	socketConnection := connectToRemoteSocket(remoteConnection)
+	socketConnection := connectToSocket(remoteConnection, "/var/run/docker.sock")
 
 	defer remoteConnection.Close()
 	defer listener.Close()
@@ -88,7 +88,7 @@ func establishTunnel(username string, hostname string, localPort string) {
 		go copyConnectionData(localConnection, *socketConnection)
 		go copyConnectionData(*socketConnection, localConnection)
 
-		socketConnection = connectToRemoteSocket(remoteConnection)
+		socketConnection = connectToSocket(remoteConnection, "/var/run/docker.sock")
 
 	}
 
