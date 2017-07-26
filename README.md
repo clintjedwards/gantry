@@ -29,7 +29,7 @@ Args:
 ```
 
 ## Example
-[![asciicast](https://asciinema.org/a/130638.png)](https://asciinema.org/a/130638)
+![example](https://i.imgur.com/7sIl4Pz.gif)
 
 ## Troubleshooting
 * Make sure the ssh key you're using is loaded via `ssh-add` (ssh agent)
