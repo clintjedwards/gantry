@@ -29,7 +29,7 @@ Args:
 ```
 
 ## Example
-![example](https://i.imgur.com/7sIl4Pz.gif)
+![example](https://i.imgur.com/3HlvoFl.gif)
 
 ## Troubleshooting
 * Make sure the ssh key you're using is loaded via `ssh-add` (ssh agent)
