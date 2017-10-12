@@ -17,7 +17,13 @@ import (
 func main() {
 
 	arguments := argumentParse()
-	go establishTunnel(arguments.remoteUsername, arguments.remoteURL, arguments.localPort)
+
+	tunnelEstablished := make(chan bool, 1)
+
+	go establishTunnel(arguments.remoteUsername, arguments.remoteURL, arguments.localPort, tunnelEstablished)
+
+	<-tunnelEstablished
+
 	os.Setenv("DOCKER_HOST", "tcp://localhost:"+arguments.localPort)
 
 	fmt.Printf("Gantry: Manage Docker over SSH 🐳\n")

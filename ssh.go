@@ -71,10 +71,12 @@ func copyConnectionData(writer, reader net.Conn) {
 }
 
 //Establish local, remote, socket connections and then allow communication
-func establishTunnel(username string, hostname string, localPort string) {
+func establishTunnel(username string, hostname string, localPort string, done chan bool) {
 	listener := establishLocalListener(localPort)
 	remoteConnection := connectToRemote(username, hostname)
 	socketConnection := connectToSocket(remoteConnection, "/var/run/docker.sock")
+
+	done <- true
 
 	defer remoteConnection.Close()
 	defer listener.Close()
